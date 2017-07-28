@@ -58,7 +58,8 @@ The environment variable is `LOCAL_PORTS` and excepts a comma-separated list of
 strings in the format of `{host}/{path}={port}`.
 
 
-#FAQ
+# FAQ
+
 ### Do I need to use host networking (`--net host`)?
 
 Depends on how your using this. If you are only using this proxy to proxy to containers,
