@@ -1,0 +1,15 @@
+version: '3'
+services:
+  localproxy:
+    build: .
+    environment:
+      LOCAL_PORTS: myexample.local=8080
+
+    network_mode: host
+
+    volumes:
+      # add certs and uncomment to test ssl
+      #- ./fullchain.pem:/certs/fullchain.pem
+      #- ./privkey.pem:/certs/privkey.pem
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
