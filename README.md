@@ -40,11 +40,11 @@ services:
 Start your container with a label
 
 ```bash
-docker run -l localproxy_expose=myapp.myhost.local=8080 myorg/mycontainer
+docker run -l proxy_expose=myapp.myhost.local=8080 myorg/mycontainer
 ```
 
 The format is:
-`localproxy_expose={host}/{path}={port container listens on}`
+`proxy_expose={host}/{path}={port container listens on}`
 
 If you are doing host based networking, you will need to add the hosts in your
 /etc/hosts file pointing to 127.0.0.1 or use an actual dns record that resolves

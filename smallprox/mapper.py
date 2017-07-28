@@ -11,7 +11,7 @@ async def update_config(config: dict):
     asyncio.ensure_future(events.run())
 
     for container in (await docker.containers.list()):
-        expose_label = container._container.get('Labels').get('localproxy_expose')
+        expose_label = container._container.get('Labels').get('roxy_expose')
         if expose_label:
             add_container(container, expose_label, config)
 
@@ -20,7 +20,7 @@ async def update_config(config: dict):
         status = event.get('status')
         if status in ('start', 'die') and event.get('Type') == 'container':
             print(event)
-            expose = event.get('Actor', {}).get('Attributes', {}).get('localproxy_expose')
+            expose = event.get('Actor', {}).get('Attributes', {}).get('proxy_expose')
             if not expose:
                 # no expose label. Ignore container
                 continue
