@@ -50,9 +50,9 @@ class HTTPServer:
     async def start(self):
         ssl = None
         port = 80
-        if os.path.isfile('fullchain.pem'):
+        if os.path.isfile('/certs/fullchain.pem'):
             context = SSLContext()
-            context.load_cert_chain('fullchain.pem', 'privkey.pem')
+            context.load_cert_chain('/certs/fullchain.pem', '/certs/privkey.pem')
             ssl = context
 
             self._redirect_server = await self._loop.create_server(
