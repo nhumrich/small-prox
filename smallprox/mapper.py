@@ -34,11 +34,15 @@ async def update_config(config: dict):
 
 
 def add_container(container, expose_label, config):
+    ip = None
     if container == 'local':
         ip = '127.0.0.1'
     else:
         networks = container._container.get('NetworkSettings').get('Networks')
-        ip = networks.get('bridge', {}).get('IPAddress')
+        for net in networks.keys():
+            if 'IPAddress' in networks[net] and networks[net]['IPAddress']:
+                ip = networks[net]['IPAddress']
+                break
 
     if ip is None:
         container_name = container._container.get('Attributes', {}).get('name')
