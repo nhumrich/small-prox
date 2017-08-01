@@ -1,6 +1,7 @@
 import asyncio
 
 import aiodocker
+import sys
 
 
 async def update_config(config: dict):
@@ -11,7 +12,7 @@ async def update_config(config: dict):
     asyncio.ensure_future(events.run())
 
     for container in (await docker.containers.list()):
-        expose_label = container._container.get('Labels').get('roxy_expose')
+        expose_label = container._container.get('Labels').get('proxy_expose')
         if expose_label:
             add_container(container, expose_label, config)
 
@@ -19,7 +20,6 @@ async def update_config(config: dict):
         event = await subscriber.get()
         status = event.get('status')
         if status in ('start', 'die') and event.get('Type') == 'container':
-            print(event)
             expose = event.get('Actor', {}).get('Attributes', {}).get('proxy_expose')
             if not expose:
                 # no expose label. Ignore container
@@ -34,14 +34,16 @@ async def update_config(config: dict):
 
 
 def add_container(container, expose_label, config):
-    print(container)
-    print(expose_label)
-
     if container == 'local':
         ip = '127.0.0.1'
     else:
         networks = container._container.get('NetworkSettings').get('Networks')
-        ip = networks.get('bridge').get('IPAddress')
+        ip = networks.get('bridge', {}).get('IPAddress')
+
+    if ip is None:
+        container_name = container._container.get('Attributes', {}).get('name')
+        print(f'An error happened trying to get '
+              f'ip address of container {container_name}', file=sys.stderr)
 
     host, path, port = parse_expose_label(expose_label)
     host_dict = config.get(host, {})
