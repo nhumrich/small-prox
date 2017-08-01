@@ -31,9 +31,9 @@ version: '3'
 services:
   smallprox:
     image: nhumrich/small-prox
-        network_mode: host
-        volumes:
-          - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 ```
 
 ### Forwarding to docker containers
