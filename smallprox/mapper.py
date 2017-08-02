@@ -49,10 +49,10 @@ def add_container(container, expose_label, config):
         print(f'An error happened trying to get '
               f'ip address of container {container_name}', file=sys.stderr)
 
-    host, path, port = parse_expose_label(expose_label)
-    host_dict = config.get(host, {})
-    host_dict[path] = f'{ip}:{port}'
-    config[host] = host_dict
+    for host, path, port in parse_expose_label(expose_label):
+        host_dict = config.get(host, {})
+        host_dict[path] = f'{ip}:{port}'
+        config[host] = host_dict
 
 
 def remove_container(container, expose_label, config):
@@ -65,20 +65,24 @@ def remove_container(container, expose_label, config):
 
 
 def parse_expose_label(expose_label):
-    url, port = expose_label.split('=')
-    if url.startswith('/'):
-        # url is only a path
-        host = '*'
-        path = 'url'
-    else:
-        # url contains a host
-        url_portions = url.split('/')
-        host = url_portions[0]
-        if len(url_portions) > 1:
-            path = url_portions[1]
+    sections = expose_label.split(',')
+    results = []
+    for section in sections:
+        url, port = section.split('=')
+        if url.startswith('/'):
+            # url is only a path
+            host = '*'
+            path = 'url'
         else:
-            path = ''
-    return host, path, port
+            # url contains a host
+            url_portions = url.split('/')
+            host = url_portions[0]
+            if len(url_portions) > 1:
+                path = url_portions[1]
+            else:
+                path = ''
+        results.append((host, path, port))
+    return results
 
 
 def get_host_and_port(host, path, config):
