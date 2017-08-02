@@ -80,7 +80,7 @@ def parse_expose_label(expose_label):
             path = 'url'
         else:
             # url contains a host
-            url_portions = url.split('/')
+            url_portions = url.split('/', 1)
             host = url_portions[0]
             if len(url_portions) > 1:
                 path = url_portions[1]
