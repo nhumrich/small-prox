@@ -136,8 +136,8 @@ class _HTTPServerProtocol(asyncio.Protocol):
                                         body=b'Redirect to https',
                                         headers={'Location': 'https://' + host + self._url.decode()}))
             return
-        logger.debug('Request from %s and path %s', host, url.path)
-        ip, port = get_host_and_port(host, url.path, self.config)
+        logger.debug('Request from %s and path %s', host, url.path.decode())
+        ip, port = get_host_and_port(host, url.path.decode(), self.config)
         if ip is None:
             self.send_response(Response(HTTPStatus.SERVICE_UNAVAILABLE,
                                         body=b'service unavailable',

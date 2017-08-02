@@ -83,7 +83,7 @@ def parse_expose_label(expose_label):
             url_portions = url.split('/', 1)
             host = url_portions[0]
             if len(url_portions) > 1:
-                path = url_portions[1]
+                path = url_portions[1].rstrip('/')
             else:
                 path = ''
         results.append((host, path, port))
@@ -91,11 +91,12 @@ def parse_expose_label(expose_label):
 
 
 def get_host_and_port(host, path, config):
+    path = path.strip('/')
     host_dict = config.get(host, {})
     all_hosts_dict = config.get('*', {})
-    host_string = host_dict.get(path)
+    host_string = host_dict[_find_path_child(path, host_dict)]
     if not host_string:
-        host_string = all_hosts_dict.get(path)
+        host_string = all_hosts_dict[_find_path_child(path, all_hosts_dict)]
     if not host_string:
         host_string = host_dict.get('')
     if not host_string:
@@ -103,3 +104,11 @@ def get_host_and_port(host, path, config):
     else:
         ip, port = host_string.split(':')
         return ip, port
+
+
+def _find_path_child(full_path, path_dict):
+    for path in sorted(path_dict.keys(), reverse=True):
+        if full_path.startswith(path):
+            return path
+
+    return None
