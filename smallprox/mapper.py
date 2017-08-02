@@ -1,7 +1,11 @@
 import asyncio
+import logging
 
 import aiodocker
 import sys
+
+
+logger = logging.getLogger('small-prox')
 
 
 async def update_config(config: dict):
@@ -31,6 +35,7 @@ async def update_config(config: dict):
                 add_container(con, expose, config)
             elif status == 'die':
                 remove_container(con, expose, config)
+            logger.debug('Changed config to: %s', config)
 
 
 def add_container(container, expose_label, config):

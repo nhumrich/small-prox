@@ -1,5 +1,6 @@
 import asyncio
 import os
+import logging
 import traceback
 from http import HTTPStatus
 from collections import namedtuple
@@ -9,6 +10,8 @@ from .mapper import get_host_and_port
 
 from httptools import HttpRequestParser, HttpParserError, parse_url
 
+
+logger = logging.getLogger('small-prox')
 
 Response = namedtuple('Response', 'status body headers')
 
@@ -133,7 +136,7 @@ class _HTTPServerProtocol(asyncio.Protocol):
                                         body=b'Redirect to https',
                                         headers={'Location': 'https://' + host + self._url.decode()}))
             return
-
+        logger.debug('Request from %s and path %s', host, url.path)
         ip, port = get_host_and_port(host, url.path, self.config)
         if ip is None:
             self.send_response(Response(HTTPStatus.SERVICE_UNAVAILABLE,
