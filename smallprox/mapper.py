@@ -94,7 +94,7 @@ def get_host_and_port(host, path, config):
     path = path.strip('/')
     host_dict = config.get(host, {})
     all_hosts_dict = config.get('*', {})
-    host_string = host_dict[_find_path_child(path, host_dict)]
+    host_string = host_dict.get(_find_path_child(path, host_dict))
     if not host_string:
         host_string = all_hosts_dict[_find_path_child(path, all_hosts_dict)]
     if not host_string:
