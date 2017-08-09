@@ -22,6 +22,8 @@ async def update_config(config: dict):
 
     while True:
         event = await subscriber.get()
+        if event is None:
+            continue
         status = event.get('status')
         if status in ('start', 'die') and event.get('Type') == 'container':
             expose = event.get('Actor', {}).get('Attributes', {}).get('proxy_expose')
