@@ -64,7 +64,8 @@ strings in the format of `{host}/{path}={port}`.
 
 Depends on how your using this. If you are only using this proxy to proxy to containers,
  then you could just forward port 80 and 443. However, in order to use the 
- "local port forwarding" feature, you will need to run on the host network.
+ "local port forwarding" feature, you will need to run on the host network. However, on MacOS, you actually
+ do not need net=host, but instead need to port forward port 80 and 443. MacOS uses a dns record `docker.for.mac.localhost` instead of `127.0.0.1` for "local forwarding".
  
 ### Can I use this in prod?
 I mean, you *could*, but I dont recommend it.
