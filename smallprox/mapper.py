@@ -44,6 +44,8 @@ def add_container(container, expose_label, config):
     ip = None
     if container == 'local':
         ip = '127.0.0.1'
+    if container == 'macos':
+        ip = 'docker.for.mac.localhost'
     else:
         networks = container._container.get('NetworkSettings').get('Networks')
         for net in networks.keys():
