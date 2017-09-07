@@ -5,9 +5,10 @@ import re
 
 import dns.resolver
 
+logging.basicConfig()
+
 from .server import HTTPServer
 from .mapper import update_config, add_container
-
 
 logger = logging.getLogger('small-prox')
 
