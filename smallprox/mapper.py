@@ -65,12 +65,12 @@ def add_container(container, expose_label, config):
 
 
 def remove_container(container, expose_label, config):
-    host, path, port = parse_expose_label(expose_label)
-    host_dict = config.get(host)
-    if len(host_dict) == 1:
-        del config[host]
-    else:
-        del host_dict[path]
+    for host, path, port in parse_expose_label(expose_label):
+        host_dict = config.get(host)
+        if len(host_dict) == 1:
+            del config[host]
+        else:
+            del host_dict[path]
 
 
 def parse_expose_label(expose_label):

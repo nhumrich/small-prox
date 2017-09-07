@@ -21,6 +21,7 @@ def _get_local_address():
     else:
         return 'macos'
 
+
 def main():
     config = {}
     loop = asyncio.get_event_loop()
