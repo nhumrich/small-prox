@@ -38,7 +38,7 @@ def main():
     for port in local_ports:
         add_container(None, port, config, ip=local_address)
 
-    logging.debug('Current container map: %s', config)
+    logger.debug('Current container map: %s', config)
 
     server = HTTPServer(loop, config)
     loop.run_until_complete(server.start())

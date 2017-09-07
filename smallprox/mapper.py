@@ -20,7 +20,7 @@ async def update_config(config: dict):
         if expose_label:
             add_container(container, expose_label, config)
 
-    logging.debug('Current container map: %s', config)
+    logger.debug('Current container map: %s', config)
 
     while True:
         event = await subscriber.get()
