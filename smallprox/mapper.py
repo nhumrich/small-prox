@@ -40,13 +40,8 @@ async def update_config(config: dict):
             logger.debug('Changed config to: %s', config)
 
 
-def add_container(container, expose_label, config):
-    ip = None
-    if container == 'local':
-        ip = '127.0.0.1'
-    if container == 'macos':
-        ip = 'docker.for.mac.localhost'
-    else:
+def add_container(container, expose_label, config, ip=None):
+    if not ip:
         networks = container._container.get('NetworkSettings').get('Networks')
         for net in networks.keys():
             if 'IPAddress' in networks[net] and networks[net]['IPAddress']:
