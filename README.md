@@ -2,7 +2,7 @@
 A small local reverse proxy (such as nginx/haproxy) for handling many local docker containers.
 
 This proxy routes traffic to specific containers based on host or path.
-It also allows you to route traffic to local ports, in case your not
+It also allows you to route traffic to local ports, in case you're not
 using docker for some services (common for local dev).
 
 This proxy is intended to route traffic to specific services much like the
@@ -37,7 +37,7 @@ services:
 ```
 
 ### Forwarding to docker containers
-Start your container with a label
+Start your container with a label:
 
 ```bash
 docker run -l proxy_expose=myapp.myhost.local=8080 myorg/mycontainer
@@ -62,7 +62,7 @@ strings in the format of `{host}/{path}={port}`.
 
 ### Do I need to use host networking (`--net host`)?
 
-Depends on how your using this. If you are only using this proxy to proxy to containers,
+Depends on how you're using this. If you are only using this proxy to proxy to containers,
  then you could just forward port 80 and 443. However, in order to use the 
  "local port forwarding" feature, you will need to run on the host network. However, on MacOS, you actually
  do not need net=host, but instead need to port forward port 80 and 443. MacOS uses a dns record `docker.for.mac.localhost` instead of `127.0.0.1` for "local forwarding".
@@ -97,6 +97,6 @@ The amount of work (not much) to do that, is about the same to just listen to ht
 forward packets. I decided to do it entirely in python as a learning experience for myself.
 Since the project is intended for local development only, I am not concerned about
 security/performance issues. 
-That being said, this project uses asyncio and one of pythons fastest http parsers, so you
+That being said, this project uses asyncio and one of python's fastest http parsers, so you
 shouldn't notice any slowness from it. 
 
