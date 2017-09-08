@@ -17,12 +17,14 @@ The container listens on the docker socket and watches for containers to start u
 The containers have a label that specifies what host and path they want
 to handle traffic for, and this proxy sends it to them on those conditions.
 
+For local forwarding, the container finds the host ip address and forwards there. For Docker on Mac, this is a dns address, but for linux its in the containers ip tables. (Currently no support for docker on windows)
+
 # Getting started
 
 To run the container simply use:
 
 ```bash
-docker run -d --net host -v /var/run/docker.sock:/var/run/docker.sock nhumrich/small-prox
+docker run -d -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock nhumrich/small-prox
 ```
 
 or use docker-compose:
@@ -31,7 +33,8 @@ version: '3'
 services:
   smallprox:
     image: nhumrich/small-prox
-    network_mode: host
+    ports:
+      - "80:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 ```
@@ -59,19 +62,12 @@ strings in the format of `{host}/{path}={port}`.
 
 
 # FAQ
-
-### Do I need to use host networking (`--net host`)?
-
-Depends on how your using this. If you are only using this proxy to proxy to containers,
- then you could just forward port 80 and 443. However, in order to use the 
- "local port forwarding" feature, you will need to run on the host network. However, on MacOS, you actually
- do not need net=host, but instead need to port forward port 80 and 443. MacOS uses a dns record `docker.for.mac.localhost` instead of `127.0.0.1` for "local forwarding".
  
 ### Can I use this in prod?
 I mean, you *could*, but I dont recommend it.
 
 ### Does it support ssl?
-Sure does! You just need to drop a `fullchain.pem` and `privkey.pem` file into
+Sure does! You just need to port forward port 443 as well, and also drop a `fullchain.pem` and `privkey.pem` file into
 the `/certs/` directory in the container and ssl will work. You could either volume mount these in
 or build your own container on top of this one. The file names are the names letsencrypt uses. 
  You could use self-signed certs, or you could create a DNS name that points to 127.0.0.1 and use dns
