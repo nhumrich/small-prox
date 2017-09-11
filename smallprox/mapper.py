@@ -71,13 +71,14 @@ def remove_container(container, expose_label, config):
 
 
 def parse_expose_label(expose_label):
+    logging.debug('Parsing expose label: %s', expose_label)
     sections = expose_label.split(',')
     results = []
     for section in sections:
         try:
             url, port = section.split('=')
         except:
-            raise SystemError(f'Error parsing expose label: {expose_label}.')
+            raise SystemError(f'Error parsing expose label: {expose_label}, at section: {section}')
         if url.startswith('/'):
             # url is only a path
             host = '*'
