@@ -64,6 +64,9 @@ def add_container(container, expose_label, config, ip=None):
 def remove_container(container, expose_label, config):
     for host, path, port in parse_expose_label(expose_label):
         host_dict = config.get(host)
+        if not host_dict:
+            # do nothing, already deleted
+            pass
         if len(host_dict) == 1:
             del config[host]
         else:
