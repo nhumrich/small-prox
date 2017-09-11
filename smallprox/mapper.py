@@ -74,11 +74,14 @@ def parse_expose_label(expose_label):
     sections = expose_label.split(',')
     results = []
     for section in sections:
-        url, port = section.split('=')
+        try:
+            url, port = section.split('=')
+        except:
+            raise SystemError(f'Error parsing expose label: {expose_label}.')
         if url.startswith('/'):
             # url is only a path
             host = '*'
-            path = 'url'
+            path = url
         else:
             # url contains a host
             url_portions = url.split('/', 1)
