@@ -21,7 +21,7 @@ def _get_local_address():
     except:
         # must be on linux, get host ip
         result = os.popen('ip r').read()
-        ip, _ = re.match('default via (.*?)\s', result).groups(1)
+        ip = re.match('default via (.*?)\s', result).groups(1)[0]
         return ip
 
 
