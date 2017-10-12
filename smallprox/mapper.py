@@ -62,14 +62,18 @@ def add_container(container, expose_label, config, ip=None):
 
 
 def remove_container(container, expose_label, config):
+    ######
+    ### Note: this method sometimes gets called twice in a row, as
+    ### docker sends two events for container dieing
+    ######
     logger.debug(f'Removing container {container} from map. Current config: {config}')
     for host, path, port in parse_expose_label(expose_label):
         host_dict = config.get(host)
         if not host_dict:
             # do nothing, already deleted
-            pass
-        if len(host_dict) == 1:
-            del config[host]
+            continue
+        if len(host_dict) == 1 and path in host_dict:
+            config.pop(host, None)
         else:
             host_dict.pop(path, None)
 
