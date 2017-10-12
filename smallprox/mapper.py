@@ -62,6 +62,7 @@ def add_container(container, expose_label, config, ip=None):
 
 
 def remove_container(container, expose_label, config):
+    logger.debug(f'Removing container {container} from map. Current config: {config}')
     for host, path, port in parse_expose_label(expose_label):
         host_dict = config.get(host)
         if not host_dict:
@@ -70,7 +71,7 @@ def remove_container(container, expose_label, config):
         if len(host_dict) == 1:
             del config[host]
         else:
-            del host_dict[path]
+            host_dict.pop(path, None)
 
 
 def parse_expose_label(expose_label):
