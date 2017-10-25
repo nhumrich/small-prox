@@ -52,7 +52,7 @@ class HTTPServer:
 
     async def start(self):
         ssl = None
-        port = 8080
+        port = 80
         if os.path.isfile('/certs/fullchain.pem'):
             context = SSLContext()
             context.load_cert_chain('/certs/fullchain.pem', '/certs/privkey.pem')
