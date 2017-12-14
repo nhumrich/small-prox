@@ -33,10 +33,9 @@ def main():
     loop = asyncio.get_event_loop()
     local_ports = os.getenv('LOCAL_PORTS', [])
     local_ports = local_ports and local_ports.split(',')
-    local_address = _get_local_address()
 
-    for port in local_ports:
-        add_container(None, port, config, ip=local_address)
+    config['_local_ports'] = local_ports
+    config['_local_address'] = _get_local_address()
 
     logger.debug('Current container map: %s', config)
 
