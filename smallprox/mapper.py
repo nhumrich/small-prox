@@ -7,9 +7,6 @@ import sys
 
 logger = logging.getLogger('small-prox')
 
-async def update_local_overrides(config: dict):
-    for port in config['_local_ports']:
-        add_container(None, port, config, ip=config['_local_address'])
 
 async def update_config(config: dict):
     docker = aiodocker.Docker()
@@ -23,7 +20,7 @@ async def update_config(config: dict):
         if expose_label:
             add_container(container, expose_label, config)
 
-    await update_local_overrides(config)
+    update_local_overrides(config)
 
     logger.debug('Current container map: %s', config)
 
@@ -44,8 +41,13 @@ async def update_config(config: dict):
                 add_container(con, expose, config)
             elif status == 'die':
                 remove_container(con, expose, config)
-            await update_local_overrides(config)
+            update_local_overrides(config)
             logger.debug('Changed config to: %s', config)
+
+
+def update_local_overrides(config: dict):
+    for port in config['_local_ports']:
+        add_container(None, port, config, ip=config['_local_address'])
 
 
 def add_container(container, expose_label, config, ip=None):
