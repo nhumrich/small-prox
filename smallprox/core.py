@@ -32,7 +32,7 @@ def main():
 
     loop = asyncio.get_event_loop()
     local_ports = os.getenv('LOCAL_PORTS', [])
-    local_ports = local_ports and local_ports.split(',')
+    local_ports = local_ports and [port.strip() for port in local_ports.split(',')]
 
     config['_local_ports'] = local_ports
     config['_local_address'] = _get_local_address()
