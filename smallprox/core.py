@@ -27,12 +27,8 @@ def _get_local_address():
 
 def _get_remote_mapping(port_mapping):
     local_host, remote_host = port_mapping.split('=')
-    if remote_host.startswith('https://'):
-        port = 443
-    else:
-        port = 80
 
-    return local_host + f'={port}', remote_host
+    return local_host + f'=0', remote_host
 
 
 def main():
