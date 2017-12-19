@@ -25,6 +25,16 @@ def _get_local_address():
         return ip
 
 
+def _get_remote_mapping(port_mapping):
+    local_host, remote_host = port_mapping.split('=')
+    if remote_host.startswith('https://'):
+        port = 443
+    else:
+        port = 80
+
+    return local_host + f'={port}', remote_host
+
+
 def main():
     config = {}
     if os.getenv('DEBUG') == 'true':
@@ -33,6 +43,11 @@ def main():
     loop = asyncio.get_event_loop()
     local_ports = os.getenv('LOCAL_PORTS', [])
     local_ports = local_ports and [port.strip() for port in local_ports.split(',')]
+    remote_ports = os.getenv('REMOTE_PORTS', [])
+
+    for port in remote_ports:
+        mapping, ip = _get_remote_mapping(port)
+        add_container(None, mapping, config, ip=ip)
 
     config['_local_ports'] = local_ports
     config['_local_address'] = _get_local_address()
