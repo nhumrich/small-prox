@@ -40,6 +40,7 @@ def main():
     local_ports = os.getenv('LOCAL_PORTS', [])
     local_ports = local_ports and [port.strip() for port in local_ports.split(',')]
     remote_ports = os.getenv('REMOTE_PORTS', [])
+    remote_ports = remote_ports and [port.strip() for port in remote_ports.split(',')]
 
     for port in remote_ports:
         mapping, ip = _get_remote_mapping(port)
