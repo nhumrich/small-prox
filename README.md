@@ -2,7 +2,7 @@
 A small local reverse proxy (such as nginx/haproxy) for handling many local docker containers.
 
 This proxy routes traffic to specific containers based on host or path.
-It also allows you to route traffic to local ports, in case your not
+It also allows you to route traffic to local ports, in case you're not
 using docker for some services (common for local dev).
 
 This proxy is intended to route traffic to specific services much like the
@@ -40,7 +40,7 @@ services:
 ```
 
 ### Forwarding to docker containers
-Start your container with a label
+Start your container with a label:
 
 ```bash
 docker run -l proxy_expose=myapp.myhost.local=8080 myorg/mycontainer
@@ -93,6 +93,6 @@ The amount of work (not much) to do that, is about the same to just listen to ht
 forward packets. I decided to do it entirely in python as a learning experience for myself.
 Since the project is intended for local development only, I am not concerned about
 security/performance issues. 
-That being said, this project uses asyncio and one of pythons fastest http parsers, so you
+That being said, this project uses asyncio and one of python's fastest http parsers, so you
 shouldn't notice any slowness from it. 
 
