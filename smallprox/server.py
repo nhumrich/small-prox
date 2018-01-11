@@ -138,6 +138,12 @@ class _HTTPServerProtocol(asyncio.Protocol):
             return
         logger.debug('Request from %s and path %s', host, url.path.decode())
         ip, port = get_host_and_port(host, url.path.decode(), self.config)
+        if port == 0:
+            self._headers['host'] = ip
+            if ip.startswith('https://'):
+                port = 443
+            else:
+                port = 80
         if ip is None:
             self.send_response(Response(HTTPStatus.SERVICE_UNAVAILABLE,
                                         body=b'service unavailable',

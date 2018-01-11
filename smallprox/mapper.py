@@ -20,6 +20,8 @@ async def update_config(config: dict):
         if expose_label:
             add_container(container, expose_label, config)
 
+    update_local_overrides(config)
+
     logger.debug('Current container map: %s', config)
 
     while True:
@@ -39,7 +41,13 @@ async def update_config(config: dict):
                 add_container(con, expose, config)
             elif status == 'die':
                 remove_container(con, expose, config)
+            update_local_overrides(config)
             logger.debug('Changed config to: %s', config)
+
+
+def update_local_overrides(config: dict):
+    for port in config['_local_ports']:
+        add_container(None, port, config, ip=config['_local_address'])
 
 
 def add_container(container, expose_label, config, ip=None):
@@ -62,23 +70,35 @@ def add_container(container, expose_label, config, ip=None):
 
 
 def remove_container(container, expose_label, config):
+    ######
+    ### Note: this method sometimes gets called twice in a row, as
+    ### docker sends two events for container dieing
+    ######
+    logger.debug(f'Removing container {container} from map. Current config: {config}')
     for host, path, port in parse_expose_label(expose_label):
         host_dict = config.get(host)
-        if len(host_dict) == 1:
-            del config[host]
+        if not host_dict:
+            # do nothing, already deleted
+            continue
+        if len(host_dict) == 1 and path in host_dict:
+            config.pop(host, None)
         else:
-            del host_dict[path]
+            host_dict.pop(path, None)
 
 
 def parse_expose_label(expose_label):
+    logging.debug('Parsing expose label: %s', expose_label)
     sections = expose_label.split(',')
     results = []
     for section in sections:
-        url, port = section.split('=')
+        try:
+            url, port = section.split('=')
+        except:
+            raise SystemError(f'Error parsing expose label: {expose_label}, at section: {section}')
         if url.startswith('/'):
             # url is only a path
             host = '*'
-            path = 'url'
+            path = url
         else:
             # url contains a host
             url_portions = url.split('/', 1)
