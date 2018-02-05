@@ -14,6 +14,10 @@ logger = logging.getLogger('small-prox')
 
 
 def _get_local_address():
+    # Pull the local address from the environment
+    addr = os.environ.get('LOCAL_ADDRESS')
+    if addr:
+        return addr
     resolver = dns.resolver.Resolver()
     for name in ('mac', 'windows'):
         try:
