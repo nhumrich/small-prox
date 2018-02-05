@@ -17,7 +17,7 @@ The container listens on the docker socket and watches for containers to start u
 The containers have a label that specifies what host and path they want
 to handle traffic for, and this proxy sends it to them on those conditions.
 
-For local forwarding, the container finds the host ip address and forwards there. For Docker on Mac, this is a dns address, but for linux its in the containers ip tables. (Currently no support for docker on windows)
+For local forwarding, the container finds the host ip address and forwards there. For Docker on Mac (or windows), this is a dns address, but for linux its in the containers ip tables.
 
 # Getting started
 

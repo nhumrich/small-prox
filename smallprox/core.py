@@ -15,14 +15,17 @@ logger = logging.getLogger('small-prox')
 
 def _get_local_address():
     resolver = dns.resolver.Resolver()
-    try:
-        resolver.query('docker.for.mac.localhost')
-        return 'docker.for.mac.localhost'
-    except:
-        # must be on linux, get host ip
-        result = os.popen('ip r').read()
-        ip = re.match('default via (.*?)\s', result).groups(1)[0]
-        return ip
+    for name in ('mac', 'windows'):
+        try:
+            resolver.query(f'docker.for.{name}.localhost')
+            return f'docker.for.{name}.localhost'
+        except:
+            pass
+
+    # must be on linux, get host ip
+    result = os.popen('ip r').read()
+    ip = re.match('default via (.*?)\s', result).groups(1)[0]
+    return ip
 
 
 def _get_remote_mapping(port_mapping):
