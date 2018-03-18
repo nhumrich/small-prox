@@ -39,6 +39,24 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 ```
 
+## Real World Example:
+Let's say you have a frontend site running at `localhost:3000` and a backend site running at `localhost:8080`. Don't forget to also add `127.0.0.1 mysite.local` to your /etc/hosts file.
+```yaml
+version: '3'
+services:
+  smallprox:
+    image: nhumrich/small-prox
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DEBUG: "True"  # or False :P
+      LOCAL_PORTS: "mysite.local=3000,mysite.local/api=8080"
+    labels:
+      - proxy_expose=mysite.local=3000
+```
+
 ### Forwarding to docker containers
 Start your container with a label:
 
