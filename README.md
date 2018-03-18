@@ -53,8 +53,6 @@ services:
     environment:
       DEBUG: "True"  # or False :P
       LOCAL_PORTS: "mysite.local=3000,mysite.local/api=8080"
-    labels:
-      - proxy_expose=mysite.local=3000
 ```
 
 ### Forwarding to docker containers
