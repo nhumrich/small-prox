@@ -98,7 +98,7 @@ def parse_expose_label(expose_label):
         if url.startswith('/'):
             # url is only a path
             host = '*'
-            path = url
+            path = url.strip('/')
         else:
             # url contains a host
             url_portions = url.split('/', 1)
