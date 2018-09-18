@@ -21,8 +21,8 @@ def _get_local_address():
     resolver = dns.resolver.Resolver()
     for name in ('mac', 'windows'):
         try:
-            resolver.query(f'docker.for.{name}.localhost')
-            return f'docker.for.{name}.localhost'
+            resolver.query(f'docker.for.{name}.host.internal')
+            return f'docker.for.{name}.host.internal'
         except:
             pass
 
