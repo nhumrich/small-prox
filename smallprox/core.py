@@ -19,12 +19,11 @@ def _get_local_address():
     if addr:
         return addr
     resolver = dns.resolver.Resolver()
-    for name in ('mac', 'windows'):
-        try:
-            resolver.query(f'docker.for.{name}.host.internal')
-            return f'docker.for.{name}.host.internal'
-        except:
-            pass
+    try:
+        resolver.query(f'host.docker.internal')
+        return f'host.docker.internal'
+    except:
+        pass
 
     # must be on linux, get host ip
     result = os.popen('ip r').read()
