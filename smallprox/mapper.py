@@ -123,7 +123,7 @@ def get_host_and_port(host, path, config):
     if not host_string:
         return None, None
     else:
-        ip, port = host_string.split(':')
+        ip, port = host_string.rsplit(':', 1)
         return ip, port
 
 

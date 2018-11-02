@@ -137,13 +137,19 @@ class _HTTPServerProtocol(asyncio.Protocol):
                                         headers={'Location': 'https://' + host + self._url.decode()}))
             return
         logger.debug('Request from %s and path %s', host, url.path.decode())
+        ssl = False
         ip, port = get_host_and_port(host, url.path.decode(), self.config)
-        if port == 0:
-            self._headers['host'] = ip
+        if port == '0':
             if ip.startswith('https://'):
                 port = 443
+                ip = ip[8:]
+                ssl = True
             else:
                 port = 80
+                ip = ip[7:]
+            self._headers['old_host'] = self._headers['host']
+            self._headers['host'] = ip
+            self._headers.pop('referer', None)
         if ip is None:
             self.send_response(Response(HTTPStatus.SERVICE_UNAVAILABLE,
                                         body=b'service unavailable',
@@ -151,7 +157,7 @@ class _HTTPServerProtocol(asyncio.Protocol):
             return
         self.client = ClientConnection(self, self._loop)
         coro = self._loop.create_connection(
-            lambda: self.client, ip, int(port))
+            lambda: self.client, ip, port=int(port), ssl=ssl)
         task = self._loop.create_task(coro)
         task.add_done_callback(self.send_data_to_client)
 
@@ -164,7 +170,13 @@ class _HTTPServerProtocol(asyncio.Protocol):
 
     def send_data_to_client(self, future=None):
         if self.client and self.client.transport:
-            self.client.send(self.data)
+            old_host = self._headers.get('old_host')
+            if old_host:
+                data = self.data.replace(f'\r\nHost: {old_host}\r\n'.encode(),
+                                         f'\r\nHost: {self._headers["host"]}\r\n'.encode())
+            else:
+                data = self.data
+            self.client.send(data)
             self.data = b''
 
     def send_raw(self, data):
