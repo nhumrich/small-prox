@@ -11,6 +11,7 @@ from .server import HTTPServer
 from .mapper import update_config, add_container
 
 logger = logging.getLogger('small-prox')
+NO_HTTPS_REDIRECT = os.getenv('NO_HTTPS_REDIRECT')
 
 
 def _get_local_address():

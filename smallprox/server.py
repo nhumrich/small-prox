@@ -58,10 +58,11 @@ class HTTPServer:
             context.load_cert_chain('/certs/fullchain.pem', '/certs/privkey.pem')
             ssl = context
 
+            ssl_forward = not self.config.get('_dont_ssl_redirect')
             self._redirect_server = await self._loop.create_server(
                 lambda: _HTTPServerProtocol(loop=self._loop,
                                             config=self.config,
-                                            ssl_forward=True),
+                                            ssl_forward=ssl_forward),
                 host='0.0.0.0',
                 port=port
             )
