@@ -133,9 +133,11 @@ class _HTTPServerProtocol(asyncio.Protocol):
         url = parse_url(self._url)
 
         if self.ssl_forward:
-            self.send_response(Response(HTTPStatus.MOVED_PERMANENTLY,
-                                        body=b'Redirect to https',
-                                        headers={'Location': 'https://' + host + self._url.decode()}))
+            self.send_response(
+                Response(HTTPStatus.MOVED_PERMANENTLY,
+                         body=b'Redirect to https',
+                         headers={'Location': 'https://' + host + self._url.decode(),
+                                  'Server': 'small-prox'}))
             return
         logger.debug('Request from %s and path %s', host, url.path.decode())
         ssl = False
