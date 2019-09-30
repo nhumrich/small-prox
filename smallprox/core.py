@@ -11,7 +11,7 @@ from .server import HTTPServer
 from .mapper import update_config, add_container
 
 logger = logging.getLogger('small-prox')
-NO_HTTPS_REDIRECT = os.getenv('NO_HTTPS_REDIRECT')
+NO_HTTPS_REDIRECT = os.getenv('NO_HTTPS_REDIRECT', 'false').lower() == 'true'
 
 
 def _get_local_address():
@@ -53,6 +53,8 @@ def main():
         mapping, ip = _get_remote_mapping(port)
         add_container(None, mapping, config, ip=ip)
 
+    if NO_HTTPS_REDIRECT:
+        config['_dont_ssl_redirect'] = True
     config['_local_ports'] = local_ports
     config['_local_address'] = _get_local_address()
 
