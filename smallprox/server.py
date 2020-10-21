@@ -8,7 +8,7 @@ from ssl import SSLContext
 
 from .mapper import get_host_and_port
 
-from httptools import HttpRequestParser, HttpParserError, parse_url
+from httptools import HttpRequestParser, HttpParserError, parse_url, HttpParserUpgrade, HttpParserInvalidMethodError
 
 
 logger = logging.getLogger('small-prox')
@@ -40,7 +40,7 @@ class ClientConnection(asyncio.Protocol):
         pass
 
     def close(self):
-        pass
+        self.transport.close()
 
 
 class HTTPServer:
@@ -110,6 +110,10 @@ class _HTTPServerProtocol(asyncio.Protocol):
             self.data += data
             self.http_parser.feed_data(data)
             self.send_data_to_client()
+        except HttpParserUpgrade as e:
+            "TODO: Handle better someday"
+        except HttpParserInvalidMethodError as e:
+            "TODO: Handle better someday"
         except HttpParserError as e:
             traceback.print_exc()
             self.send_response(Response(status=HTTPStatus.BAD_REQUEST,
