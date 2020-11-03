@@ -40,7 +40,8 @@ class ClientConnection(asyncio.Protocol):
         pass
 
     def close(self):
-        self.transport.close()
+        if self.transport:
+            self.transport.close()
 
 
 class HTTPServer:
