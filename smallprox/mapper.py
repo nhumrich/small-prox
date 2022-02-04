@@ -17,7 +17,8 @@ async def update_config(config: dict):
 
     for container in (await docker.containers.list()):
         expose_label = container._container.get('Labels').get('proxy_expose')
-        if expose_label:
+        is_oneoff = container._container.get('Labels').get('com.docker.compose.oneoff', False) == 'True'
+        if expose_label and not is_oneoff:
             add_container(container, expose_label, config)
 
     update_local_overrides(config)
@@ -29,7 +30,8 @@ async def update_config(config: dict):
         if event is None:
             continue
         status = event.get('status')
-        if status in ('start', 'die') and event.get('Type') == 'container':
+        is_oneoff = event.get('Actor', {}).get('Attributes').get('com.docker.compose.oneoff', False) == 'True'
+        if status in ('start', 'die') and event.get('Type') == 'container' and not is_oneoff:
             expose = event.get('Actor', {}).get('Attributes', {}).get('proxy_expose')
             if not expose:
                 # no expose label. Ignore container
@@ -60,8 +62,10 @@ def add_container(container, expose_label, config, ip=None):
 
     if ip is None:
         container_name = container._container.get('Attributes', {}).get('name')
+        if container_name is None:
+            container_name = container._container.get('Labels', {}).get('com.docker.compose.service')
         print(f'An error happened trying to get '
-              f'ip address of container {container_name}', file=sys.stderr)
+              f'ip address of container: {container_name}', file=sys.stderr)
 
     for host, path, port in parse_expose_label(expose_label):
         host_dict = config.get(host, {})
