@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY . /app
 
-CMD ["tini", "python3", "-u", "/app/run.py"]
+CMD ["tini", "--", "python3", "-u", "/app/run.py"]
