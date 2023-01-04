@@ -82,7 +82,7 @@ class _HTTPServerProtocol(asyncio.Protocol):
     """ HTTP Protocol handler.
         Should only be used by HTTPServerTransport
     """
-    __slots__ = ('_transport', 'data', 'http_parser',
+    __slots__ = ('_transport', 'data', 'http_parser', '_loop',
                  'client', '_headers', '_url', 'config', 'ssl_forward')
 
     def __init__(self, *, loop, config, ssl_forward=False):
@@ -144,9 +144,9 @@ class _HTTPServerProtocol(asyncio.Protocol):
                          headers={'Location': 'https://' + host + self._url.decode(),
                                   'Server': 'small-prox'}))
             return
-        logger.debug('Request from %s and path %s', host, url.path.decode())
         ssl = False
         ip, port = get_host_and_port(host, url.path.decode(), self.config)
+        logger.debug(f'Request from {host} and path {url.path.decode()} --> {ip}, {port}')
         if port == '0':
             if ip.startswith('https://'):
                 port = 443
