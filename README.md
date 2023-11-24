@@ -1,4 +1,7 @@
+
 # Small-Prox
+<img src="https://github.com/nhumrich/small-prox/assets/4661889/c4c96489-ffb0-4d5f-8b3c-2981faddebc8" width="450"/>
+
 A small local reverse proxy (such as nginx/haproxy) for handling many local docker containers.
 
 This proxy routes traffic to specific containers based on host or path.
