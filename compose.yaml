@@ -1,11 +1,9 @@
-version: '3'
 services:
   localproxy:
     build: .
     environment:
       LOCAL_PORTS: myexample.local=8080
-
-    network_mode: host
+      DEV_MODE: true
 
     volumes:
       # add certs and uncomment to test ssl

@@ -5,9 +5,11 @@ This proxy routes traffic to specific containers based on host or path.
 It also allows you to route traffic to local ports, in case you're not
 using docker for some services (common for local dev).
 
+All configuration is done via docker/docker-compose and you do not need a seperate config file.
+
 This proxy is intended to route traffic to specific services much like the
 load balancer would on a real environment (production). It helps develop locally.
- 
+
 **Note: This proxy/project is intended to ease local development. There is no
 security/performance considerations made at all. I do not recommend using this
 to route traffic anywhere except locally.**
@@ -27,9 +29,8 @@ To run the container simply use:
 docker run -d -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock nhumrich/small-prox
 ```
 
-or use docker-compose:
+or use docker-compose compose.yaml file:
 ```yaml
-version: '3'
 services:
   smallprox:
     image: nhumrich/small-prox
@@ -42,7 +43,6 @@ services:
 ## Real World Example:
 Let's say you have a frontend site running at `localhost:3000` and a backend site running at `localhost:8080`. Don't forget to also add `127.0.0.1 mysite.local` to your /etc/hosts file.
 ```yaml
-version: '3'
 services:
   smallprox:
     image: nhumrich/small-prox
@@ -51,7 +51,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      DEBUG: "True"  # or False :P
       LOCAL_PORTS: "mysite.local=3000,mysite.local/api=8080"
 ```
 
@@ -77,6 +76,106 @@ The environment variable is `LOCAL_PORTS` and excepts a comma-separated list of
 strings in the format of `{host}/{path}={port}`.
 
 
+## Full list of config options
+
+### LOCAL_PORTS
+
+You can send traffic to things running locally using the `LOCAL_PORTS` environment variable on the small-prox container.
+This is a comma-seperated string. This setting always takes priority over any other settings.
+If you have containers mapped to specific hosts or paths, the local_port always wins.
+
+Some examples:
+
+`LOCAL_PORTS: "mysite.local=3000,mysite.local/api=8080"` This Routes all traffic to mysite.local to 
+port 3000 locally. It also routes traffic starting with `/api` to port 8080 instead.
+
+`LOCAL_PORTS: "/=8000,/api=8080,/static=3000` This routes all traffic on _any host_ including localhost to port 8000.
+If the path starts with `api` it will go to port 8080 instead, and likewise, all paths starting with static will go to 3000
+
+`LOCAL_PORTS: "/api=8080,mysite.local/api=8181` This will route all traffic on _any host_ including localhost to port 8080 as 
+log as it starts with the `api` path prefix. However, if the host is specifically `mysite.local` it will go to port 8181 instead.
+
+### LOCAL_ADDRESS
+
+When running on Docker for Mac/Windows, docker adds some dns to allow this container to talk to the host.
+Sometimes, that address is wrong (Typically when running docker inside WSL2 without using Docker for Windows)
+
+This environment variable allows one to override the typical resolution IP address for "local" and use this instead.
+If you have connection issues for `LOCAL_PORTS`, you could play around with this. 
+If you are using docker-compose, you could potentially add your own override.yaml file so that the setting applies only to you:
+
+```yaml
+services:
+    proxy:
+        environment:
+            LOCAL_ADDRESS: '172.21.0.1'
+```
+
+### REMOTE_PORTS:
+
+This environment variable is very similar to `LOCAL_PORTS` except that it sends traffic to anywhere, even potentially a remote address.
+The proxy will rewrite the host header so that the receiving server does not know the original host used.
+Typically, this is needed when you want something like `service.local` to point to a remote service `myservice.example.com`.
+It is a great feature for taking local-dependencies and moving them to the cloud.
+For `LOCAL_PORTS` the right side of the `=` is a port, but for REMOTE_PORTS its a fully qualified url.
+
+Examples:
+
+`REMOTE_PORTS: "/api=staging.example.com,myservice.local=123.123.123.123:8181`
+
+### DEBUG
+
+Setting `DEBUG=true` will make the proxy give you debug logs. Useful for debugging networking issues.
+It should tell you what all the registered host-port mappings are, and also print out all incoming requests, and where it wants to send them.
+
+### NO_HTTPS_REDIRECT
+
+If you are using ssl certificates, then the proxy will automatically redirect any http calls to https.
+If you would like to disable the https redirect, you can set this: `NO_HTTPS_REDIRECT=true`, which disables it.
+
+### Container Ports
+
+This is not configurable via environment variables, but instead via labels. You can have small-prox
+send traffic to a specific container by adding a label to that container. Small prox reads docker labels
+to know which containers to send traffic too.
+
+An example for docker compose:
+```yaml
+services:
+  backend:
+    image: myorg/myimage
+    labels:
+      proxy_expose: local.example.com/api=8008
+
+```  
+This will route all traffic from local.example.com that is prefixed with the `api` path, to this container on port 8008.
+
+### Intercept docker traffic
+
+Small-prox is great for intercepting local traffic, such as local-host, and sending it wherever. (a container, a local service, etc.)
+But its also useful for sending traffic that originates from a container! In order to do that, you need to tell docker to intercept 
+traffic for the host.
+You can do that by adding network aliases. 
+
+A full example in docker-compose:
+```yaml
+services:
+  smallprox:
+    image: nhumrich/small-prox
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      LOCAL_PORTS: "mysite.local=3000,mysite.local/api=8080"
+    networks:
+      default:
+        aliases:
+         - mysite.local
+```
+
+Now another container will go to small-prox when it calls `mysite.local`, which will then in turn end up in your local container.
+
 # FAQ
  
 ### Can I use this in prod?
@@ -100,7 +199,7 @@ organization, but ended up having many many versions of it for all the different
 people wanted. I found that I wanted the "configuration" outside of the container, and 
 in the persons repo. So, here is something a little more dynamic, and loads configuration from other places 
 (docker labels). Plus, now that its in python, it gives me more flexibility to add things in the future
-if I want.
+if I want.z
 
 ### Does this use nginx/similar under the hood?
 No. This project is written entirely in python. I had thought of just implementing it by

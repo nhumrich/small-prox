@@ -1,0 +1,22 @@
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Nick Humrich",email = "nick@humrich.us"},
+]
+dependencies = [
+    "httptools",
+    "aiodocker",
+    "dnspython",
+    "pydevd-pycharm~=232.10203.26",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pydevd-pycharm~=232.10203.26",
+    "pytest>=7.4.3",
+]
