@@ -37,7 +37,12 @@ class ClientConnection(asyncio.Protocol):
         self.parent.send_raw(data)
 
     def connection_lost(self, exc):
-        pass
+        # The upstream (backend) side closed. Tear the downstream (client) side
+        # down too, or its socket leaks an FD per request — backends commonly
+        # close first (HTTP/1.1 `Connection: close`), so this is the hot path.
+        parent_transport = getattr(self.parent, '_transport', None)
+        if parent_transport:
+            parent_transport.close()
 
     def close(self):
         if self.transport:
